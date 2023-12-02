@@ -1,0 +1,61 @@
+Este é um exemplo muito básico para demonstrar a estrutura MVVM. Para implementar a integração com uma API de câmbio real e funcionalidades mais avançadas, é necessário um trabalho mais extenso.
+
+swift
+Copy code
+import SwiftUI
+
+// Model - Currency
+struct Currency {
+    let name: String
+    let rate: Double // Simula a taxa de câmbio
+}
+
+// ViewModel - CurrencyConverterViewModel
+class CurrencyConverterViewModel: ObservableObject {
+    @Published var currencies = [
+        Currency(name: "USD", rate: 1.0),
+        Currency(name: "EUR", rate: 0.85),
+        Currency(name: "GBP", rate: 0.75)
+    ]
+    
+    @Published var amountToConvert: Double = 0
+    @Published var selectedCurrencyIndex = 0
+    
+    var convertedAmount: Double {
+        let selectedCurrencyRate = currencies[selectedCurrencyIndex].rate
+        return amountToConvert * selectedCurrencyRate
+    }
+}
+
+// View
+struct ContentView: View {
+    @ObservedObject var viewModel = CurrencyConverterViewModel()
+    
+    var body: some View {
+        VStack {
+            Picker("Select Currency", selection: $viewModel.selectedCurrencyIndex) {
+                ForEach(0..<viewModel.currencies.count) { index in
+                    Text(viewModel.currencies[index].name).tag(index)
+                }
+            }
+            .pickerStyle(SegmentedPickerStyle())
+            
+            TextField("Amount", value: $viewModel.amountToConvert, formatter: NumberFormatter())
+                .textFieldStyle(RoundedBorderTextFieldStyle())
+                .padding()
+            
+            Text("Converted Amount: \(viewModel.convertedAmount, specifier: "%.2f")")
+                .padding()
+            
+            Spacer()
+        }
+        .padding()
+    }
+}
+
+struct ContentView_Previews: PreviewProvider {
+    static var previews: some View {
+        ContentView()
+    }
+}
+Este código apresenta uma estrutura básica para criar uma tela de conversão de moeda usando SwiftUI. Ela exibe um seletor para a escolha da moeda, um campo de entrada para o valor a ser convertido e exibe o valor convertido com base na taxa de câmbio simulada.
